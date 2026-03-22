@@ -1,0 +1,8 @@
+# 9) `skeleton/.gitignore`
+
+```gitignore
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.*
+*.tfplan

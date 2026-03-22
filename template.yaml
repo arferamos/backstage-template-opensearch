@@ -1,0 +1,171 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: aws-opensearch-template
+  title: AWS OpenSearch Terraform Template
+  description: Cria uma estrutura Terraform para provisionar um domínio AWS OpenSearch utilizando módulo reutilizável.
+  tags:
+    - aws
+    - terraform
+    - opensearch
+    - backstage
+spec:
+  owner: user:guest
+  type: infrastructure
+
+  parameters:
+    - title: Informações do Projeto
+      required:
+        - component_id
+        - owner
+        - repoUrl
+      properties:
+        component_id:
+          title: Nome do projeto
+          type: string
+          ui:autofocus: true
+        owner:
+          title: Owner
+          type: string
+          default: user:guest
+        repoUrl:
+          title: Repositório GitHub
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+    - title: Parâmetros AWS OpenSearch
+      required:
+        - aws_region
+        - domain_name
+        - environment
+        - acronym
+        - engine_version
+        - instance_type
+        - instance_count
+        - ebs_enabled
+        - ebs_volume_size
+        - vpc_id
+        - subnet_ids
+      properties:
+        aws_region:
+          title: AWS Region
+          type: string
+          default: us-east-1
+
+        domain_name:
+          title: Nome do domínio OpenSearch
+          type: string
+
+        environment:
+          title: Ambiente
+          type: string
+          enum:
+            - dev
+            - hml
+            - prod
+          default: dev
+
+        acronym:
+          title: Acrônimo
+          type: string
+          default: plcd
+
+        engine_version:
+          title: Versão do engine
+          type: string
+          default: OpenSearch_2.11
+
+        instance_type:
+          title: Tipo de instância
+          type: string
+          default: t3.small.search
+
+        instance_count:
+          title: Quantidade de instâncias
+          type: integer
+          default: 1
+
+        ebs_enabled:
+          title: Habilitar EBS
+          type: boolean
+          default: true
+
+        ebs_volume_size:
+          title: Tamanho do EBS (GB)
+          type: integer
+          default: 20
+
+        vpc_id:
+          title: VPC ID
+          type: string
+
+        subnet_ids:
+          title: Subnets
+          type: array
+          items:
+            type: string
+
+        security_group_ids:
+          title: Security Groups adicionais
+          type: array
+          items:
+            type: string
+          default: []
+
+        tags:
+          title: Tags adicionais
+          type: object
+          additionalProperties:
+            type: string
+          default: {}
+
+  steps:
+    - id: fetch-base
+      name: Buscar skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          component_id: ${{ parameters.component_id }}
+          owner: ${{ parameters.owner }}
+          aws_region: ${{ parameters.aws_region }}
+          domain_name: ${{ parameters.domain_name }}
+          environment: ${{ parameters.environment }}
+          acronym: ${{ parameters.acronym }}
+          engine_version: ${{ parameters.engine_version }}
+          instance_type: ${{ parameters.instance_type }}
+          instance_count: ${{ parameters.instance_count }}
+          ebs_enabled: ${{ parameters.ebs_enabled }}
+          ebs_volume_size: ${{ parameters.ebs_volume_size }}
+          vpc_id: ${{ parameters.vpc_id }}
+          subnet_ids: ${{ parameters.subnet_ids }}
+          security_group_ids: ${{ parameters.security_group_ids }}
+          tags: ${{ parameters.tags }}
+
+    - id: publish
+      name: Publicar no GitHub
+      action: publish:github
+      input:
+        allowedHosts:
+          - github.com
+        description: Repositório Terraform para AWS OpenSearch gerado via Backstage
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+
+    - id: register
+      name: Registrar no catálogo
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Repositório criado
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Abrir no catálogo
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
