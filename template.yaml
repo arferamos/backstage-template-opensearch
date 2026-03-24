@@ -98,23 +98,6 @@ spec:
           type: integer
           default: 20
 
-        vpc_id:
-          title: VPC ID
-          type: string
-
-        subnet_ids:
-          title: Subnets
-          type: array
-          items:
-            type: string
-
-        security_group_ids:
-          title: Security Groups adicionais
-          type: array
-          items:
-            type: string
-          default: []
-
         tags:
           title: Tags adicionais
           type: object
@@ -140,9 +123,6 @@ spec:
           instance_count: ${{ parameters.instance_count }}
           ebs_enabled: ${{ parameters.ebs_enabled }}
           ebs_volume_size: ${{ parameters.ebs_volume_size }}
-          vpc_id: ${{ parameters.vpc_id }}
-          subnet_ids: ${{ parameters.subnet_ids }}
-          security_group_ids: ${{ parameters.security_group_ids }}
           tags: ${{ parameters.tags }}
 
     - id: publish
