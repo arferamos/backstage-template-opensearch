@@ -1,3 +1,4 @@
+```yaml
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
@@ -9,6 +10,7 @@ metadata:
     - terraform
     - opensearch
     - backstage
+
 spec:
   owner: user:guest
   type: infrastructure
@@ -19,15 +21,19 @@ spec:
         - component_id
         - owner
         - repoUrl
+        - vpc_id
+        - subnet_ids
       properties:
         component_id:
           title: Nome do projeto
           type: string
           ui:autofocus: true
+
         owner:
           title: Owner
           type: string
           default: user:guest
+
         repoUrl:
           title: Repositório GitHub
           type: string
@@ -35,6 +41,16 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+
+        vpc_id:
+          title: VPC ID
+          type: string
+
+        subnet_ids:
+          title: Subnet IDs
+          type: array
+          items:
+            type: string
 
     - title: Parâmetros AWS OpenSearch
       required:
@@ -47,8 +63,6 @@ spec:
         - instance_count
         - ebs_enabled
         - ebs_volume_size
-        - vpc_id
-        - subnet_ids
       properties:
         aws_region:
           title: AWS Region
@@ -123,6 +137,8 @@ spec:
           instance_count: ${{ parameters.instance_count }}
           ebs_enabled: ${{ parameters.ebs_enabled }}
           ebs_volume_size: ${{ parameters.ebs_volume_size }}
+          vpc_id: ${{ parameters.vpc_id }}
+          subnet_ids: ${{ parameters.subnet_ids }}
           tags: ${{ parameters.tags }}
 
     - id: publish
@@ -149,3 +165,4 @@ spec:
       - title: Abrir no catálogo
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
+```
