@@ -144,8 +144,6 @@ spec:
       name: Publicar no GitHub
       action: publish:github
       input:
-        allowedHosts:
-          - github.com
         description: Repositório Terraform para AWS OpenSearch gerado via Backstage
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
